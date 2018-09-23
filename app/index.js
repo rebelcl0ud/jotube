@@ -11,19 +11,64 @@ function WatchList(props) {
 	)
 }
 
+function StreamerDeets(props) {
+	// display stream deets
+	return (
+		<div>
+			<ul>
+				{props.streams.map(({display_name, login, description, view_count, profile_image_url}) => (
+					<ul key={display_name}>
+						<img src={profile_image_url}/>
+						<li><a href=''>{display_name}</a></li>
+						<li>{description}</li>
+						<li>{view_count}</li>
+					</ul>
+				))}
+			</ul>
+		</div>
+
+	)
+}
+
 class App extends React.Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			streamers: [],
+			streamers: ['relaxbeats'],
+			streams:[],
 		}
 
 		this.handleWatchList = this.handleWatchList.bind(this);
+		this.fetchStreamerData = this.fetchStreamerData.bind(this);
+	}
+
+	componentDidUpdate(prevProp, prevState) {
+		if(this.state.streamers !== prevState.streamers) {
+			this.fetchStreamerData(this.state.streamers)
+		}
+	}
+
+	componentDidMount() {
+		this.fetchStreamerData(this.state.streamers);
+	}
+
+	fetchStreamerData(streamer) {
+		// calls API
+		const clientID = 'aoduqmn77opdqjxy9aqirf976btdpk'; // can be public
+	
+		fetch(`https://api.twitch.tv/helix/users?login=${streamer}`, { headers: {'Client-ID': clientID}})
+			.then((data) => data.json())
+			.then((streams) => {
+				// console.log(streams)
+					this.setState({
+						streams: streams.data,
+					})
+			})
 	}
 
 	handleWatchList(streamer) {
-		console.log(streamer)
+		// console.log(streamer)
 		this.setState({
 			streamers: streamer,
 		})
@@ -33,6 +78,7 @@ class App extends React.Component {
 		return (
 			<div>
 				<WatchList onWatch={this.handleWatchList}/>
+				<StreamerDeets streams={this.state.streams}/>
 			</div>
 		)
 	}
