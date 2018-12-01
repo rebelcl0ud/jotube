@@ -18,7 +18,7 @@ require('./index.css')
 
 const Navbar = () => {
 	return (
-		<nav class="navbar navbar-dark mb-5">
+		<nav className="navbar navbar-dark mb-5">
 			<span className='navbar-brand mb-0 h1'>joTube</span>
 		</nav>
 	)
