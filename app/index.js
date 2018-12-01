@@ -3,7 +3,8 @@ const ReactDOM = require('react-dom');
 require('./index.css')
 
 /**
-
+	<img src={profile_image_url}/>
+	<li><a href=''>{display_name}</a></li>
 **/
 
 // function WatchList(props) {
@@ -31,13 +32,13 @@ function StreamerDeets(props) {
 			<div className='col-md-8'>
 				<div className='card-mb-4 shadow-sm'>
 					<div className='card-body'>
-						<ul>
-							{props.streams.map(({display_name, login, description, view_count, profile_image_url}) => (
-								<ul key={display_name}>
-									<img src={profile_image_url}/>
-									<li><a href=''>{display_name}</a></li>
-									<li>{description}</li>
-									<li>{view_count}</li>
+						<ul className='list-group list-group-flush'>
+							{props.streams.map(({language, started_at, title, type, user_name, viewer_count}) => (
+								<ul key={user_name}>
+									<h5 className='card-header'>{user_name} | <span className='card-subtitle text-muted'>{title}</span></h5>
+									<li className='list-group-item'>Language: {language}</li>
+									{type === 'live' ? <li className='list-group-item'>Status: LIVE 📺</li> : <li className='list-group-item'>Status: seems to be offline ¯|_(ツ)_/¯</li>}
+									<li className='list-group-item'>Viewer Count: {viewer_count}</li>
 								</ul>
 							))}
 						</ul>
@@ -55,7 +56,7 @@ class App extends React.Component {
 		this.state = {
 			streamers: ['relaxbeats'],
 			streams:[],
-			onlineID: [],
+			user: [],
 		}
 
 		// this.handleWatchList = this.handleWatchList.bind(this);
@@ -82,26 +83,26 @@ class App extends React.Component {
 	fetchStreamerData(streamer) {
 		// calls API [user]
 		const clientID = 'aoduqmn77opdqjxy9aqirf976btdpk'; // can be public
-		fetch(`https://api.twitch.tv/helix/users?login=${streamer}`, { headers: {'Client-ID': clientID}})
+		fetch(`https://api.twitch.tv/helix/streams?user_login=${streamer}`, { headers: {'Client-ID': clientID}})
 			.then((res) => res.json())
 			.then((streams) => {
-				console.log(streams.data)
+				// console.log(streams.data)
 					this.setState({
 						streams: streams.data,
 					})
 
-					return fetch(`https://api.twitch.tv/helix/streams?user_login=${streamer}`, { headers: {'Client-ID': clientID}})
+					return fetch(`https://api.twitch.tv/helix/users?login=${streamer}`, { headers: {'Client-ID': clientID}})
 			})
 			.then((res) => res.json())
-			.then((streaming) => {
-				console.log(streaming.data)
-			// 	streaming.data.map(({type, user_id}) => {
-			// 		if(type == 'live') {
-			// 			this.setState({
-			// 				onlineID: user_id
-			// 			})
-			// 		}
-			// 	})
+			.then((user) => {
+				console.log(user.data)
+					// user.data.map(({description, id, profile_image_url}) => {
+						// if(type == 'live') {
+							this.setState({
+								user: user.data
+							})
+						// }
+					// })
 			})
 			.catch((err) => {
 				console.error(err);
